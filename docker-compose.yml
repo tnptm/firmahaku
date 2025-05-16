@@ -1,0 +1,32 @@
+version: '3.9'
+
+services:
+  db:
+    image: postgres:16
+    container_name: postgres-db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - ./pg_data/main:/var/lib/postgresql/data
+    networks:
+      - app-network
+    ports:
+      - "5433:5432"
+
+  nextjs:
+    build: ./firmahaku
+    container_name: nextjs-web
+    environment:
+      - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_USER}@db:${POSTGRES_PORT}/${POSTGRES_DB}
+    networks:
+      - app-network
+    ports:
+      - "3001:3000"
+    depends_on:
+      - db
+
+networks:
+  app-network:
+    driver: bridge
