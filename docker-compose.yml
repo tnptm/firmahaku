@@ -1,32 +1,39 @@
-version: '3.9'
+#version: '3.9'
 
 services:
   db:
-    image: postgres:16
+    build: ./pg
+    restart: always
     container_name: postgres-db
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
     volumes:
-      - ./pg_data/main:/var/lib/postgresql/data
+      - ./pg/data:/var/lib/postgresql/data
+    #  - ./pg_data/init:/docker-entrypoint-initdb.d
+    #  - /etc/postgresql:/etc/postgresql
     networks:
-      - app-network
+      - internal
     ports:
-      - "5433:5432"
+      - "5435:5432"
+    #  - "2222:22"
 
   nextjs:
     build: ./firmahaku
+    restart: always
     container_name: nextjs-web
     environment:
       - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_USER}@db:${POSTGRES_PORT}/${POSTGRES_DB}
     networks:
-      - app-network
+      - internal
     ports:
       - "3001:3000"
     depends_on:
       - db
+    volumes:    
+      - ./firmahaku:/home/apps/firma/firmahaku
 
 networks:
-  app-network:
+  internal: 
     driver: bridge
