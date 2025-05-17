@@ -9,7 +9,7 @@ export default function FirmaHaku() {
     const handleSearch = () => {
         console.log("Hakusana:", searchTerm);
         if (searchTerm.trim().length > 2){
-            fetch(`/api/search?q=${searchTerm}`)
+            fetch(`api/search?q=${searchTerm}`)
                 .then((response) => {
                     if (!response.ok) {
                         throw new Error("Network response was not ok");

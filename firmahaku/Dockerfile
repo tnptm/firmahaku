@@ -25,7 +25,8 @@ WORKDIR /home/apps/firma/firmahaku
 
 # Install dependencies
 #COPY package*.json ./
-#RUN npm install -g next
+RUN npm install 
+#-g next
 
 # Copy the app
 #COPY . .
