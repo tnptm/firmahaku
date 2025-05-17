@@ -29,11 +29,11 @@ jobs:
 
     - name: Copy project to server
       run: |
-        rsync -az -e "ssh -p 20203" --delete --exclude='.env'  ./ ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }}:${{ secrets.DEPLOY_DIR }}
+        rsync -az -e "ssh -p 20203 -o HostKeyAlgorithms=+ssh-rsa -o KexAlgorithms=+diffie-hellman-group1-sha1" --delete --exclude='.env'  ./ ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }}:${{ secrets.DEPLOY_DIR }}
 
     - name: Deploy with Docker Compose
       run: |
-        ssh -p 20203 ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} << 'EOF'
+        ssh -p 20203 -o HostKeyAlgorithms=+ssh-rsa -o KexAlgorithms=+diffie-hellman-group1-sha1 ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} << 'EOF'
           cd ${{ secrets.DEPLOY_DIR }}
           docker compose down
           docker compose up -d --build
