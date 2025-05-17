@@ -29,7 +29,7 @@ jobs:
 
     - name: Copy project to server
       run: |
-        rsync -avz -e "ssh -i ~/.ssh/id_ed25519 -p 20203 --delete --exclude='.env'  ./ ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }}:${{ secrets.DEPLOY_DIR }}
+        rsync -avz -e "ssh -i ~/.ssh/id_ed25519 -p 20203" --delete --exclude='.env'  ./ ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }}:${{ secrets.DEPLOY_DIR }}
 
     - name: Deploy with Docker Compose
       run: |
