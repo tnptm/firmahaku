@@ -1,11 +1,15 @@
-FROM ubuntu:24.04
+# Use the official PostgreSQL image as the base
+# postresql:latest (it is with Debian OS so apt works)
+FROM postgres:17.5
 
+# Set environment variable to non-interactive to avoid prompts
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get update && apt-get install -y \
-    postgresql \
-    openssh-server \
-    sudo \
+# Update package lists and install required tools
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+#    openssh-server \
+    htop \
     mc \
     nano \
     python3 \
@@ -15,18 +19,12 @@ RUN apt-get update && apt-get install -y \
     libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Set up PostgreSQL
-RUN mkdir -p /var/run/postgresql && chown -R postgres:postgres /var/run/postgresql
-
-# Set up SSH
+# Set up SSH server (optional basic config)
 RUN mkdir /var/run/sshd
 
-# Create postgres user SSH access
-RUN echo "postgres:password" | chpasswd
-RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
+# Expose SSH port (22) in addition to PostgreSQL port (5432)
+EXPOSE 5432 
+#22
 
-USER postgres
-
-# Start both SSH and PostgreSQL using supervisord or a shell script
-USER root
-CMD service postgresql start && /usr/sbin/sshd -D
+# Set default command to run PostgreSQL as usual
+CMD ["docker-entrypoint.sh", "postgres"]

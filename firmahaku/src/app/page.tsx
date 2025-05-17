@@ -10,7 +10,11 @@ export default function Home() {
         </p>
         <FirmaHaku />
       </main>
-        
+      <footer className="flex items-center justify-center w-full h-24 border-t">
+        <p className="text-sm text-gray-500">
+          &copy; 2025 Firmahaku. All rights reserved.
+        </p>
+      </footer>
     </div>
   );
 }

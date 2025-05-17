@@ -31,8 +31,9 @@ WORKDIR /home/apps/firma/firmahaku
 #COPY . .
 
 # Build the Next.js app
-RUN npm run build
+# RUN npm run build
 
 # Expose port and start the app
 EXPOSE 3000
-CMD ["npm", "start"]
+#CMD ["npm", "start"]
+CMD ["npm", "run", "dev"]
