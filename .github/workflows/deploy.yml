@@ -17,8 +17,8 @@ jobs:
       run: |
         mkdir -p ~/.ssh
         chmod 700 ~/.ssh
-        echo "${{ secrets.PROD_SSH_KEY }}" > ~/.ssh/id_rsa
-        chmod 600 ~/.ssh/id_rsa
+        echo "${{ secrets.PROD_SSH_KEY }}" > ~/.ssh/id_ed25519
+        chmod 600 ~/.ssh/id_ed25519
         ssh-keyscan -p 20203 -H ${{ secrets.PROD_HOST }} >> ~/.ssh/known_hosts
         chmod 600 ~/.ssh/known_hosts
 
