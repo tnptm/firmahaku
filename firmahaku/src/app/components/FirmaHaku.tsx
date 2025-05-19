@@ -47,11 +47,9 @@ export default function FirmaHaku() {
                     onClick={handleSearch}
                 >Hae
                 </button>
-                {isLoading & (
-                    <span>
-                        Ladataan tietoja...
-                    </span>
-                )}
+                <span>
+                    { isLoading && 'Ladataan tietoja...' }
+                </span>
             </div>
             <div id="result-container" className="mt-8">
                 <h2 className="text-2xl font-semibold">Hakutulokset</h2>
