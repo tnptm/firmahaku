@@ -5,10 +5,13 @@ import { useState } from "react"
 export default function FirmaHaku() {
     const [searchTerm, setSearchTerm] = useState("");
     const [results, setResults] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleSearch = () => {
         console.log("Hakusana:", searchTerm);
+        
         if (searchTerm.trim().length > 2){
+            setIsLoading(true);
             fetch(`api/search?q=${searchTerm}`)
                 .then((response) => {
                     if (!response.ok) {
@@ -17,11 +20,14 @@ export default function FirmaHaku() {
                     return response.json();
                 })
                 .then((data) => {
+                    setIsLoading(false)
                     console.log("Hakutulokset:", data);
                     setResults(data);
                 })
                 .catch((error) => {
+                    setIsLoading(false)
                     console.error("Fetch error:", error);
+                    alert("Error in fetcing data")
                 });
 
         }
@@ -41,6 +47,11 @@ export default function FirmaHaku() {
                     onClick={handleSearch}
                 >Hae
                 </button>
+                {isLoading & (
+                    <span>
+                        Ladataan tietoja...
+                    </span>
+                )}
             </div>
             <div id="result-container" className="mt-8">
                 <h2 className="text-2xl font-semibold">Hakutulokset</h2>
