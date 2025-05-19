@@ -1,0 +1,9 @@
+pg/data/
+
+# Exclude all .env files in any directory
+*.env
+
+# Exclude all node_modules directories anywhere in the project
+node_modules/
+# .git/
+*.log

@@ -31,8 +31,10 @@ services:
       - "3001:3000"
     depends_on:
       - db
-    volumes:    
-      - ./firmahaku:/home/apps/firma/firmahaku
+    # commented because it copies the source code to the container in dockerfile
+    #volumes:    
+    #
+    #  - ./firmahaku:/home/apps/firma/firmahaku
 
 networks:
   internal: 

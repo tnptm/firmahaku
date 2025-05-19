@@ -24,12 +24,12 @@ RUN mkdir -p /home/apps/firma/firmahaku/
 WORKDIR /home/apps/firma/firmahaku
 
 # Install dependencies
-#COPY package*.json ./
+COPY package*.json ./
 RUN npm install 
 #-g next
 
 # Copy the app
-#COPY . .
+COPY . .
 
 # Build the Next.js app
 # RUN npm run build
