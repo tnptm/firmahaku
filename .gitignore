@@ -1,1 +1,4 @@
 .env
+pg/firmat_dump.sql
+.vscode/
+
