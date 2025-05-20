@@ -18,7 +18,9 @@ export async function GET(req: Request) {
                     type TEXT,\
                     \"registrationDate\" TEXT )\
                 WHERE n.name ILIKE $1 \
-            ORDER BY \"registrationDate\"::timestamp DESC LIMIT 1 ) n;",
+                ORDER BY \"registrationDate\"::timestamp DESC LIMIT 1 \
+            ) n \
+          ORDER BY n.name;",
         [`%${q}%`]
         );
         client.release();
