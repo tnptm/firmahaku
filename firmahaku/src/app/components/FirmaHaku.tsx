@@ -1,7 +1,10 @@
 'use client';
 
 import { useState } from "react"
-
+import FirmaLink from "./FirmaLink";
+import FirmaData from "./FirmaData";
+import LoadIndicator from "./utils/LoadIndicator";
+import { useLanguage } from "../context/LanguageContext";
 // Search performace timer
 class MyTimer {
     startTime: number;
@@ -15,6 +18,7 @@ class MyTimer {
     start() {
         this.startTime = Date.now();
     }
+
     stop() {
         this.endTime = Date.now();
     }
@@ -27,11 +31,27 @@ class MyTimer {
     }
 }
 
+export interface FirmaResult {
+    id: number;
+    yt: string;
+    name: string;
+    type: string;
+    registrationDate: string;
+}
+
+/*type FirmaLinkProps = {
+    linkdata: FirmaResult;
+    onClicking: (firmaId: number) => void;
+}*/
+
 export default function FirmaHaku() {
     const [searchTerm, setSearchTerm] = useState("");
-    const [results, setResults] = useState([]);
+    const [results, setResults] = useState<FirmaResult[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [duration, setDuration] = useState(0);
+    const [showResults, setShowResults] = useState(true);
+    const [selectedCompany, setSelectedCompany] = useState<FirmaResult | null>(null);
+    const { language } = useLanguage();
     //const [startTime, setStartTime] = useState(0);
     //const [endTime, setEndTime] = useState(0);
 
@@ -55,6 +75,7 @@ export default function FirmaHaku() {
     }*/
 
     const handleSearch = () => {
+        setShowResults(true);
         console.log("Hakusana:", searchTerm);
         const myTimer = new MyTimer();
         if (searchTerm.trim().length > 2){
@@ -85,8 +106,16 @@ export default function FirmaHaku() {
         }
     }
 
+    function handleLinkClick(firma: FirmaResult) {
+
+        console.log("Link clicked:", firma.id);
+        setShowResults(false);
+        setSelectedCompany(firma);
+    }
+
     return (
         <>
+            <span>lang: {language}</span>
             <div className="mt-8">
                 <input
                     type="text"
@@ -99,41 +128,52 @@ export default function FirmaHaku() {
                     onClick={handleSearch}
                 >Hae
                 </button>
-                <div className="h-8">
-                    <span>
-                        { isLoading && 'Ladataan tietoja...' }
-                    </span>
-                </div>
+                <span className="h-8 w-8 inline-block">
+                    <LoadIndicator isLoading={isLoading} />
+                </span>
                 
             </div>
-            <div id="result-container" className="mt-8">
-                <h2 className="text-2xl font-semibold">Hakutulokset</h2>
-                <div>
-                    <small>
+            <div className={`${showResults ? 'block' : 'hidden'}`}>
+                <div id="result-container" className="mt-8">
+                    <h2 className="text-2xl font-semibold">Hakutulokset</h2>
+                    <div>
+                        <small>
+                            {
+                                results.length > 0 &&  `Tuloksia: ${results.length} kpl, haku kesti: ${duration.toFixed(2)} s`
+                            }
+                        </small>
+                    </div>
+                    <div id="results" className="mt-4">
                         {
-                            results.length > 0 &&  `Tuloksia: ${results.length} kpl, haku kesti: ${duration.toFixed(2)} s`
-                        }
-                    </small>
+                            /* Hakutulokset näytetään täällä */
+                            results.length > 0 ? (
+                                <ul className="list-disc pl-5">
+                                    {results.map((result: FirmaResult, index) => (
+                                        <li key={index} className="mb-2">
+                                            <FirmaLink linkdata={result} onClicking={handleLinkClick} />
+                                        </li>
+                                    ))}
+                                </ul>   
+                            ) : (
+                                <p className="text-gray-500">Ei hakutuloksia</p>
+                            )                 
+                        } 
+                    </div>
                 </div>
-                <div id="results" className="mt-4">
-                    {
-                        /* Hakutulokset näytetään täällä */
-                        results.length > 0 ? (
-                            <ul className="list-disc pl-5">
-                                {results.map((result: any, index) => (
-                                    <li key={index} className="mb-2">
-                                        <a href={`firma/${result.id}`} className="text-blue-500 hover:underline">
-                                            {`${result.name} (${result.yt})`}
-                                        </a>
-                                    </li>
-                                ))}
-                            </ul>   
-                        ) : (
-                            <p className="text-gray-500">Ei hakutuloksia</p>
-                        )                 
-                    } 
-                </div>
-            </div>    
+            </div>
+            <div className={`${!showResults ? 'block' : 'hidden'}`}>
+                {/* back to search results*/}
+                <button className="mt-4 mb-4 px-2 py-1 text-black bg-white hover:bg-blue-100"
+                    onClick={() => {
+                        setShowResults(true);
+                        setSelectedCompany(null);
+
+                    }}>
+                        Takaisin tuloksiin
+                </button>
+                
+                <FirmaData firma={selectedCompany} />
+            </div> 
         </>
     )
 }
