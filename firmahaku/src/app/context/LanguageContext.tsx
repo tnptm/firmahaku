@@ -8,12 +8,12 @@ const LanguageContext = createContext<{
     language: Language;
     setLanguage: (lang: Language) => void;
 }>({
-    language: 'en',
+    language: 'fi',
     setLanguage: () => {},
 });
 
 export const LanguageProvider = ({ children }: { children: ReactNode }) => {
-    const [language, setLanguageState] = useState<Language>('en');
+    const [language, setLanguageState] = useState<Language>('fi');
 
     useEffect(() => {
         const saved = localStorage.getItem('lang') as Language | null;

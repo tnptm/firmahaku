@@ -1,10 +1,13 @@
 'use client';
 
-import { useState } from "react"
-import FirmaLink from "./FirmaLink";
+import { useState, useEffect } from "react"
+
 import FirmaData from "./FirmaData";
+import FirmaPaginator from "./FirmaPaginator";
 import LoadIndicator from "./utils/LoadIndicator";
 import { useLanguage } from "../context/LanguageContext";
+import { NPTrans } from "../lib/translations"
+import NpTransC from "./NpTransC";
 // Search performace timer
 class MyTimer {
     startTime: number;
@@ -43,6 +46,26 @@ export interface FirmaResult {
     linkdata: FirmaResult;
     onClicking: (firmaId: number) => void;
 }*/
+const trans = new NPTrans()
+/*
+function getTranslatedTextAfterDelay(key:string):Promise<string> {
+    return new Promise(resolve => {
+        setTimeout(() => {
+            resolve(trans.getTranslation(key))
+        }, 500)
+    })
+}
+*/
+// Solve how this handleTranslation can return value inside the FirmaHaku react rendering
+/*async function handleTranslation(key: string){
+    const retval = getTranslatedTextAfterDelay(key).then((text) => {
+        console.log("Translation:", text)
+        return text})
+    console.log("Retval:", retval)
+    //return text    
+}
+*/
+
 
 export default function FirmaHaku() {
     const [searchTerm, setSearchTerm] = useState("");
@@ -52,6 +75,9 @@ export default function FirmaHaku() {
     const [showResults, setShowResults] = useState(true);
     const [selectedCompany, setSelectedCompany] = useState<FirmaResult | null>(null);
     const { language } = useLanguage();
+    const [cleaning, setCleaning] = useState(false)
+    const [updtT, setUpdtT] = useState(0)
+    const [currentCode, setCurrentCode] = useState('fi')
     //const [startTime, setStartTime] = useState(0);
     //const [endTime, setEndTime] = useState(0);
 
@@ -61,18 +87,23 @@ export default function FirmaHaku() {
         }
     }
 
-    /* timer ei toimi statessa
-    function endFetchTimer() {
-        let end = Date.now();
-        //setEndTime(end);
-        const duration = end - startTime;
-        setDuration(duration);
-        console.log("Fetch kesti:", ((end - startTime)/1000).toFixed(4), "s");
-    }
-    function resetFetchTimer() {
-        setStartTime(0);
-        //setEndTime(0);
-    }*/
+    useEffect(()=>{
+        // This code is needed for getting small update once after short delay of 
+        // changing the language that translation functions will be triggered too in UI
+        // UseEffect is triggered whne language is changed or updt counter is increased by one..
+        if (currentCode != language){
+            setTimeout(()=>setUpdtT(updtT + 1),200)
+
+            //setUpdtT(updtT + 1) // makes this use effect be triggered again
+            trans.setLanguage(language)
+            setCurrentCode(language)
+        }
+
+        trans.setLanguage(language)
+        
+        console.log("Language changed to:" + language)
+    },[language, updtT])
+
 
     const handleSearch = () => {
         setShowResults(true);
@@ -111,22 +142,25 @@ export default function FirmaHaku() {
         console.log("Link clicked:", firma.id);
         setShowResults(false);
         setSelectedCompany(firma);
+        setCleaning(false)
     }
 
+ 
     return (
         <>
-            <span>lang: {language}</span>
+            {/*<span>lang: {language}</span>*/}
             <div className="mt-8">
                 <input
                     type="text"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    placeholder="Etsi yrityksiä"
+                    placeholder={`${trans.getTranslation("haku_placeholder")}`}
                     className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
                 <button className="ml-2 px-4 py-2 text-white bg-blue-500 rounded-lg hover:bg-blue-600"
                     onClick={handleSearch}
-                >Hae
+                >
+                    <NpTransC trkey={'haku'}/>
                 </button>
                 <span className="h-8 w-8 inline-block">
                     <LoadIndicator isLoading={isLoading} />
@@ -135,44 +169,33 @@ export default function FirmaHaku() {
             </div>
             <div className={`${showResults ? 'block' : 'hidden'}`}>
                 <div id="result-container" className="mt-8">
-                    <h2 className="text-2xl font-semibold">Hakutulokset</h2>
+                    <h2 className="text-2xl font-semibold">
+                        <NpTransC trkey={"hakutulokset"}/>
+                    </h2>
                     <div>
                         <small>
                             {
-                                results.length > 0 &&  `Tuloksia: ${results.length} kpl, haku kesti: ${duration.toFixed(2)} s`
+                                results.length > 0 &&  `${trans.getTranslation("tuloksia")}: ${results.length} ${trans.getTranslation("kpl")}, ${trans.getTranslation("haku_kesti")}: ${duration.toFixed(2)} s`
                             }
                         </small>
                     </div>
                     <div id="results" className="mt-4">
-                        {
-                            /* Hakutulokset näytetään täällä */
-                            results.length > 0 ? (
-                                <ul className="list-disc pl-5">
-                                    {results.map((result: FirmaResult, index) => (
-                                        <li key={index} className="mb-2">
-                                            <FirmaLink linkdata={result} onClicking={handleLinkClick} />
-                                        </li>
-                                    ))}
-                                </ul>   
-                            ) : (
-                                <p className="text-gray-500">Ei hakutuloksia</p>
-                            )                 
-                        } 
+                        <FirmaPaginator results={results} onClicking={handleLinkClick}/>
                     </div>
                 </div>
             </div>
             <div className={`${!showResults ? 'block' : 'hidden'}`}>
                 {/* back to search results*/}
-                <button className="mt-4 mb-4 px-2 py-1 text-black bg-white hover:bg-blue-100"
+                <button className="mt-4 mb-4 px-2 py-1 text-gray-700 bg-green-300 hover:bg-green-400 rounded text-sm cursor-pointer"
                     onClick={() => {
                         setShowResults(true);
                         setSelectedCompany(null);
-
+                        setCleaning(true)
                     }}>
-                        Takaisin tuloksiin
+                        {`<<  ${trans.getTranslation("takaisin_haku")}`}
                 </button>
                 
-                <FirmaData firma={selectedCompany} />
+                <FirmaData firma={selectedCompany} clean={cleaning} />
             </div> 
         </>
     )
