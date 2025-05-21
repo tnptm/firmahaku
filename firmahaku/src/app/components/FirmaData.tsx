@@ -334,8 +334,8 @@ export default function FirmaData({ firma, clean }: { firma: FirmaResult | null,
                                 <span className="font-semibold">Nimet: </span>
                                 <ul>
                                 {
-                                    firmaDetailsAny.desc_json.names.map(n => (
-                                      <li className="ml-8"> 
+                                    firmaDetailsAny.desc_json.names.map((n,index) => (
+                                      <li key={index} className="ml-8"> 
                                             {`${n.name} (${n?.registrationDate})`}
                                       
                                       </li> 
@@ -368,8 +368,8 @@ export default function FirmaData({ firma, clean }: { firma: FirmaResult | null,
                                 <span className="font-semibold">Historia: </span>
                                     <ul>
                                     {
-                                    firmaDetailsAny?.desc_json?.registeredEntries.map(e => (
-                                        <li className="ml-8">{
+                                    firmaDetailsAny?.desc_json?.registeredEntries.map((e,index) => (
+                                        <li key={index} className="ml-8">{
                                             `${e.type}: ${e.descriptions.find(l => l.languageCode == 1).description} (${e.registrationDate})`
                                         }
                                         </li>

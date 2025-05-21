@@ -8,10 +8,27 @@ export default function FirmaPaginator({results, onClicking}:{results: FirmaResu
     const [itemsOnPage, setItemsOnPage] = useState(10)
     const [pageList, setPageList] = useState<Number[]>([])
 
+    const [maxPage, setMaxPage] = useState<Number>(0)
+
     useEffect(
         ()=>{
-            const maxPage = (results.length / itemsOnPage)
-        }
+            if (itemsOnPage>0){
+                const maxPage = Math.floor(results.length / itemsOnPage)+1
+                setMaxPage(maxPage)
+            } 
+            
+        },[results]
+    )
+
+    useEffect(
+        // create data for pages list
+        ()=>{
+            let listPageNumbers = []
+            for (let i=0; i < parseInt(maxPage.toString()); i++){
+                listPageNumbers.push(i)
+            }
+            setPageList(listPageNumbers)
+        }, [maxPage]
     )
 
     function handleLinkClick(data: FirmaResult){
@@ -33,10 +50,21 @@ export default function FirmaPaginator({results, onClicking}:{results: FirmaResu
                             ))
                         }
                     </ul>
-                    <div>
-                        <input type="text" value={page} onChange={e => setPage(Number(e.target.value))}/>
+                    <div className="mt-8 ">                  
+                        {/*<input className="border p-2 rounded" type="text" value={page} onChange={e => setPage(Number(e.target.value))}/>*/}
+                        <div className="rounded bg-slate-300 p-2 mb-4 mx-4 my-4 w-fit">{(page + 1).toString()}/{maxPage.toString()}</div>
                         <div>
-
+                            {
+                                pageList.length > 0 && pageList.map((item, index) => (
+                                        <button 
+                                        className="px-1 mx-0.5 rounded-sm bg-amber-200 cursor-pointer hover:bg-amber-400 border border-gray-500" 
+                                        onClick={e => setPage(Number(item))}
+                                        key={index}>
+                                            {(Number(item) + 1).toString()}
+                                        </button>
+                                    )
+                                )
+                            }
                         </div>
                     </div>
                 </>
